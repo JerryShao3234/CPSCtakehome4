@@ -63,7 +63,7 @@ void process()
   /* Traverses maze and generates all solutions */
   // INSERT YOUR CODE HERE (1 line)
   // generate_all_paths(...
-
+  generate_all_paths(&paths, &paths_found, maze, dimension, 0, 0, outputstring);
   /* Calculates and displays required data */
   // INSERT YOUR CODE HERE
 }
@@ -134,12 +134,12 @@ maze_cell** parse_maze( FILE* maze_file, int dimension )
   /* Allocates memory for correctly-sized maze */
   // INSERT CODE HERE (1 line)
   // maze = ( maze_cell ** ) calloc ... (1 line)
-    maze = (maze_cell**)calloc(dimension, sizeof(int));
+    maze = (maze_cell**)calloc(dimension, sizeof(maze_cell*));
 
   for ( row = 0; row < dimension; ++row ) {
     // INSERT CODE HERE (1 line)
     // maze[row] = ( maze_cell* ) calloc ... (1 line)
-      maze[row] = (maze_cell*)calloc(dimension, sizeof(int));
+      maze[row] = (maze_cell*)calloc(dimension, sizeof(maze_cell));
   }
 
   /* Copies maze file to memory */
@@ -148,7 +148,9 @@ maze_cell** parse_maze( FILE* maze_file, int dimension )
     for ( column = 0; column < dimension; ++column ) {
       // INSERT CODE HERE (2 lines)
       // maze[row][column].character = ...
+        maze[row][column].character = line_buffer[column];
       // maze[row][column].visited = ...
+        maze[row][column].visited = UNVISITED;
 	  }
     row++;
   }
@@ -271,7 +273,7 @@ int path_cost ( char* path_string )
   }
   return cost;
   
-  return cost;
+
 }
 
 /*
