@@ -54,7 +54,6 @@ void process()
       // INSERT YOUR CODE HERE (2 lines)
       dimension = get_maze_dimension(maze_file);
       maze = parse_maze(maze_file, dimension);
-
   }
   else {
     fprintf(stderr, "Unable to parse maze file: %s\n", MAZE1);
@@ -63,7 +62,7 @@ void process()
 
   /* Traverses maze and generates all solutions */
   // INSERT YOUR CODE HERE (1 line)
-  //generate_all_paths(
+  // generate_all_paths(...
 
   /* Calculates and displays required data */
   // INSERT YOUR CODE HERE
@@ -83,7 +82,7 @@ int get_maze_dimension( FILE* maze_file )  {
   int  dimension = 0;
   char line_buffer[BUFFER];
 
-	dimension = strlen( fgets ( line_buffer, BUFFER, maze_file ) ); //the maze is guaranteed to be square, so only need to check one side -jerry
+	dimension = strlen( fgets ( line_buffer, BUFFER, maze_file ) );
 
 	/* You don't need to know this.  It 'resets' the file's internal pointer to the
 	   beginning of the file. */
@@ -92,14 +91,14 @@ int get_maze_dimension( FILE* maze_file )  {
     /* Checks if text file was created in Windows and contains '\r'
 	   IF TRUE reduce strlen by 2 in order to omit '\r' and '\n' from each line
 	   ELSE    reduce strlen by 1 in order to omit '\n' from each line */
-  if ( strchr( line_buffer, '\r' ) != NULL ) { //    \r vs \n???
+  if ( strchr( line_buffer, '\r' ) != NULL ) {
     // INSERT CODE HERE (1 line)
+    // return ...
       return dimension - 2;
-    // return ...
   } else {
-      return dimension;
     // INSERT CODE HERE (1 line)
     // return ...
+      return dimension - 1;
   }
 }
 
@@ -134,10 +133,12 @@ maze_cell** parse_maze( FILE* maze_file, int dimension )
 
   /* Allocates memory for correctly-sized maze */
   // INSERT CODE HERE (1 line)
+  // maze = ( maze_cell ** ) calloc ... (1 line)
     maze = (maze_cell**)calloc(dimension, sizeof(int));
 
   for ( row = 0; row < dimension; ++row ) {
     // INSERT CODE HERE (1 line)
+    // maze[row] = ( maze_cell* ) calloc ... (1 line)
       maze[row] = (maze_cell*)calloc(dimension, sizeof(int));
   }
 
@@ -146,8 +147,8 @@ maze_cell** parse_maze( FILE* maze_file, int dimension )
   while ( fgets ( line_buffer, BUFFER, maze_file ) ) {
     for ( column = 0; column < dimension; ++column ) {
       // INSERT CODE HERE (2 lines)
-      maze[row][column].character = ...
-      maze[row][column].visited = ...
+      // maze[row][column].character = ...
+      // maze[row][column].visited = ...
 	  }
     row++;
   }
@@ -179,7 +180,7 @@ maze_cell** parse_maze( FILE* maze_file, int dimension )
  POST:      dereferenced pathset contains all paths found
  POST:      dereferences numpaths contains the number of paths found
  */
-//MUST USE RECURSION !!!
+//MUST USE RECURSION!!!
 void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze, int dimension, int row, int column, char* path )
 {
 	/* Variables */
@@ -256,18 +257,20 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
 int path_cost ( char* path_string )
 {
   int cost = 0;
+	// INSERT CODE HERE
   int i = 0;
-  char* temp = path_string;
-
-  if (temp[0] == '\0') { 
+  
+  if (path_string[0] == '\0') {
       cost = 0;
   }
   else {
-      while (temp[i] != '\0') {
-          cost+=temp[i];
-          i++; 
+      while (path_string[i] != '\0') {
+          cost += path_string[i];
+          i++;
       }
   }
+  return cost;
+  
   return cost;
 }
 
