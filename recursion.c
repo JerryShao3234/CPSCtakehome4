@@ -134,11 +134,11 @@ maze_cell** parse_maze( FILE* maze_file, int dimension )
 
   /* Allocates memory for correctly-sized maze */
   // INSERT CODE HERE (1 line)
-  // maze = ( maze_cell ** ) calloc ... (1 line)
+    maze = (maze_cell**)calloc(dimension, sizeof(int));
 
   for ( row = 0; row < dimension; ++row ) {
     // INSERT CODE HERE (1 line)
-    // maze[row] = ( maze_cell* ) calloc ... (1 line)
+      maze[row] = (maze_cell*)calloc(dimension, sizeof(int));
   }
 
   /* Copies maze file to memory */
@@ -146,8 +146,8 @@ maze_cell** parse_maze( FILE* maze_file, int dimension )
   while ( fgets ( line_buffer, BUFFER, maze_file ) ) {
     for ( column = 0; column < dimension; ++column ) {
       // INSERT CODE HERE (2 lines)
-      // maze[row][column].character = ...
-      // maze[row][column].visited = ...
+      maze[row][column].character = ...
+      maze[row][column].visited = ...
 	  }
     row++;
   }
