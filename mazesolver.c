@@ -1,10 +1,10 @@
 /*
  File:          mazesolver.c
- Purpose:       Add a brief description
- Author:			  Your names
- Student #s:		12345678 and 12345678
- CS Accounts:		a1a1 and b2b2
- Date:				  Add the date here
+ Purpose:       lab4 takehome
+ Author:			Robin Yuan, Jerry Shao
+ Student #s:		88011879 and 84982321
+ CS Accounts:		b9k3b  and c1i3b
+ Date:				Nov 15, 2020
  */
 
  
@@ -44,7 +44,8 @@ void process()
   /* Opens and parses the maze file.  Replace the first parameter of fopen with
     different file names defined in the preprocessor section of the header file
     to test your mazesolver with our sample mazes. */
-  maze_file = fopen(MAZE1, "r");
+  maze_file = fopen(MAZE3877, "r");
+
 
   if (maze_file) {
 
@@ -53,7 +54,12 @@ void process()
       b) copies the maze into memory */
       // INSERT YOUR CODE HERE (2 lines)
       // dimension = ...
-      // maze = parse_maze( ...
+      // maze = parse_maze( ..
+	  dimension = get_maze_dimension(maze_file);
+	  maze = parse_maze(maze_file, dimension);
+
+
+
 
   }
   else {
@@ -64,9 +70,21 @@ void process()
   /* Traverses maze and generates all solutions */
   // INSERT YOUR CODE HERE (1 line)
   // generate_all_paths(...
+  int row = 0;
+  char** pathsetref = (char**)calloc(dimension, sizeof(char*));//we initialize a 2d array to store successful paths 
+  for (row = 0; row < dimension; ++row)
+  {
+	  pathsetref[row] = (char*)calloc(dimension, sizeof(char));
+  }
 
-  /* Calculates and displays required data */
-  // INSERT YOUR CODE HERE
+  int numpathsref = 0;  row = 0; int column = 0; char* path = ""; //varaibles
+  generate_all_paths(&pathsetref, &numpathsref, maze, dimension, row, column, path);//generate all paths
+  //print results
+  printf("Total number of solutions: %d \n", numpathsref);
+  construct_shortest_path_info(pathsetref, numpathsref, outputstring);
+  printf("%s\n", outputstring);
+  construct_cheapest_path_info(pathsetref, numpathsref, outputstring);
+  printf("%s\n", outputstring);
 }
 
 /*
@@ -78,27 +96,27 @@ void process()
  RETURN:    length of the first line of text in the maze file EXCLUDING any EOL characters
             ('\n' or '\r') and EXCLUDING the string-terminating null ('\0') character.
  */
-int get_maze_dimension( FILE* maze_file )  {
+int get_maze_dimension(FILE* maze_file) {
 
-  int  dimension = 0;
-  char line_buffer[BUFFER];
+	int  dimension = 0;
+	char line_buffer[BUFFER];
 
-	dimension = strlen( fgets ( line_buffer, BUFFER, maze_file ) );
+	dimension = strlen(fgets(line_buffer, BUFFER, maze_file));//get size
+	// fgets prototype: char *fgets(char *str, int n, FILE *stream)
+	// It reads a line from the specified stream and stores it into the string pointed to by str. 
+	//It stops when either (n-1) characters are read, the newline character is read, or the end-of-file is reached, whichever comes first.
+
 
 	/* You don't need to know this.  It 'resets' the file's internal pointer to the
 	   beginning of the file. */
-	fseek( maze_file, 0, SEEK_SET );
+	fseek(maze_file, 0, SEEK_SET);
 
-    /* Checks if text file was created in Windows and contains '\r'
+	/* Checks if text file was created in Windows and contains '\r'
 	   IF TRUE reduce strlen by 2 in order to omit '\r' and '\n' from each line
 	   ELSE    reduce strlen by 1 in order to omit '\n' from each line */
-  if ( strchr( line_buffer, '\r' ) != NULL ) {
-    // INSERT CODE HERE (1 line)
-    // return ...
-  } else {
-    // INSERT CODE HERE (1 line)
-    // return ...
-  }
+	if (strchr(line_buffer, '\r') != NULL) return dimension -= 2; 
+	else return --dimension;
+
 }
 
 /*
@@ -133,19 +151,21 @@ maze_cell** parse_maze( FILE* maze_file, int dimension )
   /* Allocates memory for correctly-sized maze */
   // INSERT CODE HERE (1 line)
   // maze = ( maze_cell ** ) calloc ... (1 line)
-
-  for ( row = 0; row < dimension; ++row ) {
-    // INSERT CODE HERE (1 line)
-    // maze[row] = ( maze_cell* ) calloc ... (1 line)
+	
+	maze = (maze_cell**)calloc(dimension, sizeof(maze_cell*));//initialize maze
+  for ( row = 0; row < dimension; ++row )
+  {    
+    maze[row] = (maze_cell*)calloc(dimension, sizeof(maze_cell));
   }
 
   /* Copies maze file to memory */
 	row = 0;
-  while ( fgets ( line_buffer, BUFFER, maze_file ) ) {
-    for ( column = 0; column < dimension; ++column ) {
-      // INSERT CODE HERE (2 lines)
-      // maze[row][column].character = ...
-      // maze[row][column].visited = ...
+  while ( fgets ( line_buffer, BUFFER, maze_file ) ) //fill in maze
+  {
+    for ( column = 0; column < dimension; ++column ) 
+	{
+		maze[row][column].character = line_buffer[column];
+		maze[row][column].visited   = UNVISITED;
 	  }
     row++;
   }
@@ -185,11 +205,8 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
 	char* new_path   = NULL;
 
   /* Checks for base cases */
-  if ( // INSERT CODE HERE: Simply return if we hit one of the base cases (there are more than 1)
-       // (remember to delete 1 on the next line, which is here so the incomplete program compiles)
-       1 ) {
-    return;
-	}
+  if (column>=dimension|| column < 0 || row < 0|| row >= dimension|| maze[row][column].character=='*'|| maze[row][column].visited == VISITED) return;
+	//check bonndry condtions, wall, visited
 
   /* Otherwise deals with the recursive case.  Pushes the current coordinate onto the path
 	  and checks to see if the right boundary of the maze has been reached
@@ -219,7 +236,7 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
 			    for a new solution string
 			 2. Copy the solution path to the location of new string
 			 3. Increment paths counter */
-	    *pathsetref = ( char** ) realloc ( *pathsetref, ( (*numpathsref) + 1 ) * sizeof( char* ) );
+	   *pathsetref = ( char** ) realloc ( *pathsetref, ( (*numpathsref) + 1 ) * sizeof( char* ) );
       (*pathsetref)[*numpathsref] = ( char* ) calloc( strlen( new_path ) + 1, sizeof( char ));
 	    strcpy( (*pathsetref)[*numpathsref], new_path );
 	    (*numpathsref)++;
@@ -229,12 +246,12 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
 			   2. Recursively search in each direction using the new path, and the same pathsetref and numpathsref
 			   3. Mark point as unvisited */
       // INSERT CODE HERE (6 lines)
-      // maze.[row][column].visited = ...
-      // generate_all_paths...
-      // generate_all_paths...
-      // generate_all_paths...
-      // generate_all_paths...
-      // maze.[row][column].visited = ...
+		maze[row][column].visited = VISITED;
+		generate_all_paths(pathsetref, numpathsref, maze, dimension, row + 1, column, new_path);
+		generate_all_paths(pathsetref, numpathsref, maze, dimension, row - 1, column, new_path);
+		generate_all_paths(pathsetref, numpathsref, maze, dimension, row, column + 1, new_path);
+		generate_all_paths(pathsetref, numpathsref, maze, dimension, row, column - 1, new_path);
+		maze[row][column].visited = UNVISITED;
 		  return;
     }
   }
@@ -253,8 +270,12 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
 int path_cost ( char* path_string )
 {
   int cost = 0;
-	// INSERT CODE HERE
-  
+  int digit = 0;
+  for (int index = 0; index < strlen(path_string); index++)
+  {//a way to extract digits from a string
+	  digit = path_string[index] - '0';
+	  cost += digit;
+  }
   return cost;
 }
 
@@ -272,7 +293,16 @@ int path_cost ( char* path_string )
  */
 void construct_shortest_path_info ( char** pathset, int numpaths, char* outputbuffer )
 {
-	// INSERT CODE HERE
+	strcpy(outputbuffer, *pathset);
+	for (int index = 0; index < numpaths; index++)
+		if (strlen(*(pathset + index)) < strlen(outputbuffer))//if ones shorter than replace the current outputbuffer
+		{
+			strcpy(outputbuffer, *(pathset + index)); 
+			
+		}
+	char str[BUFFER] = "";
+    strcpy(str, outputbuffer);
+	sprintf(outputbuffer, "Shortest path: %s\0", str);//output string according to the guideline
 }
 
 /*
@@ -291,7 +321,16 @@ void construct_shortest_path_info ( char** pathset, int numpaths, char* outputbu
  */
 void construct_cheapest_path_info ( char** pathset, int numpaths, char* outputbuffer )
 {
-	// INSERT CODE HERE
+	strcpy(outputbuffer, *pathset);
+	for(int index=0; index<numpaths; index++)
+		if(path_cost(*(pathset + index))< path_cost( outputbuffer))//if ones cheaper than replace the current outputbuffer
+		{
+			strcpy(outputbuffer, *(pathset + index));
+		
+		}
+	char str[BUFFER] = "";
+	strcpy(str, outputbuffer);
+	sprintf(outputbuffer, "Cheapest path: %s\nCheapest path cost: %d\0", str, path_cost(str));//output string according to the guideline
 }
 
 /* End of file */
